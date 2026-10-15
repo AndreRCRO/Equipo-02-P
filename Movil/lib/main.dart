@@ -30,7 +30,8 @@ class _ConsultaLoteState extends State<ConsultaLote> {
               onChanged: (valor) => codigo = valor.trim().toUpperCase(),
             ),
             ElevatedButton(
-              onPressed: () => setState(() => resultado = lotes[codigo] ?? ''),
+              onPressed: () => setState(() => resultado =
+                  lotes[codigo] ?? 'No existe un lote con ese código.'),
               child: const Text('Consultar'),
             ),
             Text(resultado),
