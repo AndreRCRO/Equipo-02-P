@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroTrace - Registro de Lotes de Cosecha & Trazabilidad</title>
+  <meta name="description" content="Sistema de registro de lotes de cosecha agrícola para iniciar la trazabilidad de origen de los productos con código único, QR y gestión para productores.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+</head>
+<body>
+
+  <!-- Barra de Navegación Superior -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-icon-wrapper">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a9 9 0 0 1 9 9c0 4.97-4.03 9-9 9A9 9 0 0 1 3 11C3 6.03 7.03 2 12 2Z"></path>
+            <path d="M12 22V12"></path>
+            <path d="M12 12c-2.5-3-5.5-3-7 0"></path>
+            <path d="M12 12c2.5-3 5.5-3 7 0"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Agro<span>Trace</span></h1>
+          <span class="brand-subtitle">Módulo de Trazabilidad y Origen Agrícola</span>
+        </div>
+      </div>
+
+      <div class="nav-badges">
+        <div class="role-badge" title="Módulo activo para productores de campo">
+          <span class="role-badge-dot"></span>
+          <span>Productor Agrícola</span>
+        </div>
+        <button id="btn-reset-demo" class="btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;" title="Restaurar ejemplos de prueba">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
+          Ejemplos
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal de la Aplicación -->
+  <main class="main-wrapper">
+
+    <!-- Fila de Indicadores Clave (KPIs) -->
+    <section class="kpi-grid" aria-label="Resumen de producción agrícola">
+      <div class="kpi-card">
+        <div class="kpi-icon green">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="kpi-details">
+          <div class="kpi-title">Total Lotes Registrados</div>
+          <div class="kpi-value" id="kpi-total-lots">0</div>
+          <div class="kpi-trend">Con código único generado</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon amber">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20v-6M6 20V10M18 20V4"></path>
+          </svg>
+        </div>
+        <div class="kpi-details">
+          <div class="kpi-title">Volumen Total Cosechado</div>
+          <div class="kpi-value" id="kpi-total-volume">0 kg</div>
+          <div class="kpi-trend">Acumulado en trazabilidad</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon blue">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a9 9 0 0 1 9 9c0 4.97-4.03 9-9 9A9 9 0 0 1 3 11C3 6.03 7.03 2 12 2Z"></path>
+          </svg>
+        </div>
+        <div class="kpi-details">
+          <div class="kpi-title">Cultivos Activos</div>
+          <div class="kpi-value" id="kpi-active-crops">0</div>
+          <div class="kpi-trend">Variedades en campo</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon slate">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div class="kpi-details">
+          <div class="kpi-title">Última Cosecha</div>
+          <div class="kpi-value" id="kpi-last-date" style="font-size: 1.25rem;">-</div>
+          <div class="kpi-trend">Fecha más reciente</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disposición Principal en 2 Columnas -->
+    <div class="content-grid">
+
+      <!-- COLUMNA IZQUIERDA: Formulario de Registro de Lote -->
+      <section aria-labelledby="form-heading">
+        <div class="form-card">
+          <div class="card-header">
+            <span class="card-header-badge">Paso 1: Origen de Campo</span>
+            <h2 id="form-heading" class="card-title">Registrar Lote de Cosecha</h2>
+            <p class="card-description">
+              Como productor, ingresa los datos de recolección para iniciar la cadena de custodia y trazabilidad.
+            </p>
+          </div>
+
+          <form id="harvest-form" novalidate>
+
+            <!-- Campo 1: Cultivo (Obligatorio) -->
+            <div class="form-group">
+              <label class="form-label" for="input-cultivo">
+                <span>Cultivo</span>
+                <span class="required-badge">Obligatorio</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a9 9 0 0 1 9 9c0 4.97-4.03 9-9 9A9 9 0 0 1 3 11C3 6.03 7.03 2 12 2Z"></path>
+                    <path d="M12 12v10"></path>
+                  </svg>
+                </span>
+                <select id="input-cultivo" class="form-select" required>
+                  <option value="" disabled selected>Selecciona un cultivo...</option>
+                  <option value="Café Arábica">☕ Café Arábica</option>
+                  <option value="Café Robusta">☕ Café Robusta</option>
+                  <option value="Cacao Criollo">🍫 Cacao Criollo</option>
+                  <option value="Aguacate Hass">🥑 Aguacate Hass</option>
+                  <option value="Maíz Blanco">🌽 Maíz Blanco</option>
+                  <option value="Papa Criolla">🥔 Papa Criolla</option>
+                  <option value="Tomate Chonto">🍅 Tomate Chonto</option>
+                  <option value="Plátano Hartón">🍌 Plátano Hartón</option>
+                  <option value="Arroz Paddy">🌾 Arroz Paddy</option>
+                  <option value="Mango Tommy">🥭 Mango Tommy</option>
+                  <option value="Otro">🌱 Otro cultivo...</option>
+                </select>
+              </div>
+              <div id="error-cultivo" class="field-error-msg"></div>
+            </div>
+
+            <!-- Campo condicional si elige Otro cultivo -->
+            <div class="form-group" id="custom-cultivo-group" style="display: none;">
+              <label class="form-label" for="input-custom-cultivo">
+                <span>Nombre del Cultivo Personalizado</span>
+                <span class="required-badge">Obligatorio</span>
+              </label>
+              <input type="text" id="input-custom-cultivo" class="form-input" placeholder="Ej: Fresa Monterrey, Maracuyá, etc.">
+            </div>
+
+            <!-- Campo 2: Fecha de Cosecha (Obligatoria) -->
+            <div class="form-group">
+              <label class="form-label" for="input-fecha">
+                <span>Fecha de Cosecha</span>
+                <span class="required-badge">Obligatorio</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
+                <input type="date" id="input-fecha" class="form-input" required>
+              </div>
+              <div id="error-fecha" class="field-error-msg"></div>
+            </div>
+
+            <!-- Campo 3: Cantidad Cosechada (Obligatoria) -->
+            <div class="form-group">
+              <label class="form-label" for="input-cantidad">
+                <span>Cantidad Cosechada</span>
+                <span class="required-badge">Obligatorio</span>
+              </label>
+              <div class="quantity-group">
+                <div class="input-with-icon">
+                  <span class="input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                  </span>
+                  <input type="number" id="input-cantidad" class="form-input" placeholder="Ej: 850" min="0.01" step="any" required>
+                </div>
+                <select id="input-unidad" class="form-select">
+                  <option value="kg" selected>kg (Kilos)</option>
+                  <option value="Toneladas">Ton</option>
+                  <option value="Quintales">Quintales</option>
+                  <option value="Cajas">Cajas</option>
+                  <option value="Bultos">Bultos</option>
+                </select>
+              </div>
+              <div id="error-cantidad" class="field-error-msg"></div>
+            </div>
+
+            <!-- Campos adicionales de enriquecimiento de trazabilidad -->
+            <div class="form-group">
+              <label class="form-label" for="input-parcela">
+                <span>Parcela / Sector de Origen</span>
+                <span class="optional-badge">Opcional</span>
+              </label>
+              <input type="text" id="input-parcela" class="form-input" placeholder="Ej: Finca La Esperanza - Lote 3B">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-productor">
+                <span>Productor Responsable</span>
+                <span class="optional-badge">Opcional</span>
+              </label>
+              <input type="text" id="input-productor" class="form-input" placeholder="Ej: Mauricio Morales">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-metodo">
+                <span>Método de Cosecha</span>
+                <span class="optional-badge">Opcional</span>
+              </label>
+              <select id="input-metodo" class="form-select">
+                <option value="Manual Selectiva" selected>Manual Selectiva (Grano a Grano / Fruto Maduro)</option>
+                <option value="Manual Global">Manual Global</option>
+                <option value="Mecanizada">Mecanizada con Maquinaria</option>
+                <option value="Semimecanizada">Semimecanizada</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-notas">
+                <span>Observaciones Fitosanitarias / Calidad</span>
+                <span class="optional-badge">Opcional</span>
+              </label>
+              <textarea id="input-notas" class="form-textarea" rows="2" placeholder="Notas sobre humedad, clima, madurez o condiciones..."></textarea>
+            </div>
+
+            <!-- Vista previa del código único asignado -->
+            <div class="code-preview-card">
+              <div class="code-preview-meta">
+                <span class="code-preview-label">Código Único Auto-Generado</span>
+                <span class="code-preview-value mono" id="preview-code">LOT-AGR-XXXXXXXX-XXXX</span>
+              </div>
+              <span class="code-badge-pill">Garantía Única</span>
+            </div>
+
+            <!-- Botón de Envío -->
+            <button type="submit" id="btn-submit-lot" class="btn-primary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+              <span>Registrar Lote & Iniciar Trazabilidad</span>
+            </button>
+
+          </form>
+        </div>
+      </section>
+
+      <!-- COLUMNA DERECHA: Lista de Lotes Registrados -->
+      <section class="list-section" aria-labelledby="list-heading">
+
+        <!-- Barra de Herramientas de la Lista -->
+        <div class="list-toolbar">
+          <div class="toolbar-search">
+            <div class="input-with-icon">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </span>
+              <input type="text" id="search-input" class="form-input" placeholder="Buscar por código, cultivo, parcela o productor...">
+            </div>
+          </div>
+
+          <div class="toolbar-filters">
+            <select id="filter-crop" class="filter-select">
+              <option value="ALL">Todos los Cultivos</option>
+            </select>
+
+            <div class="view-toggle">
+              <button id="btn-view-grid" class="view-btn active" title="Vista de Tarjetas">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </button>
+              <button id="btn-view-table" class="view-btn" title="Vista de Tabla">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Encabezado de la Sección de Lotes -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h3 id="list-heading" style="font-size: 1.15rem;">Lotes Registrados en Custodia</h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+            Garantía de trazabilidad inmutable
+          </span>
+        </div>
+
+        <!-- Vista en Grid (Tarjetas) -->
+        <div id="lots-container" class="lots-grid">
+          <!-- Renderizado dinámicamente con JavaScript -->
+        </div>
+
+        <!-- Vista en Tabla -->
+        <div id="table-wrapper" class="lots-table-wrapper">
+          <table class="lots-table">
+            <thead>
+              <tr>
+                <th>Código Único</th>
+                <th>Cultivo</th>
+                <th>Fecha Cosecha</th>
+                <th>Cantidad</th>
+                <th>Parcela</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Renderizado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vacío cuando no hay resultados -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">🌾</div>
+          <h4 class="empty-state-title">No hay lotes registrados</h4>
+          <p class="empty-state-desc">
+            No se encontraron lotes que coincidan con los criterios de búsqueda o aún no has registrado tu primera cosecha.
+          </p>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Modal de Pasaporte de Trazabilidad & Código QR -->
+  <div id="trace-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Pasaporte de Trazabilidad del Lote
+        </h3>
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="Cerrar modal">✕</button>
+      </div>
+
+      <div class="modal-body" id="modal-details-content">
+        <!-- Contenido generado dinámicamente -->
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-modal-print" class="btn-primary" style="width: auto; padding: 0.6rem 1.1rem; font-size: 0.88rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          Imprimir Ficha / Rótulo QR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para Notificaciones Toast Flotantes -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Pie de Página -->
+  <footer class="footer">
+    <p>AgroTrace &copy; 2026 - Módulo de Trazabilidad Agrícola para Productores de Campo. Datos locales persistentes.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
